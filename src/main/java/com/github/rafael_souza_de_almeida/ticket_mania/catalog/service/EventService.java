@@ -1,9 +1,9 @@
-package com.github.rafael_souza_de_almeida.ticket_mania.service;
+package com.github.rafael_souza_de_almeida.ticket_mania.catalog.service;
 
-import com.github.rafael_souza_de_almeida.ticket_mania.domain.Event;
-import com.github.rafael_souza_de_almeida.ticket_mania.dto.EventRequestDto;
-import com.github.rafael_souza_de_almeida.ticket_mania.dto.EventResponseDto;
-import com.github.rafael_souza_de_almeida.ticket_mania.repository.EventRepository;
+import com.github.rafael_souza_de_almeida.ticket_mania.catalog.domain.Event;
+import com.github.rafael_souza_de_almeida.ticket_mania.catalog.dto.EventRequestDto;
+import com.github.rafael_souza_de_almeida.ticket_mania.catalog.dto.EventResponseDto;
+import com.github.rafael_souza_de_almeida.ticket_mania.catalog.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

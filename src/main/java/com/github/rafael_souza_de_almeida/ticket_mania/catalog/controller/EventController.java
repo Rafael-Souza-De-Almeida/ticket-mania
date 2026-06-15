@@ -1,8 +1,8 @@
-package com.github.rafael_souza_de_almeida.ticket_mania.controller;
+package com.github.rafael_souza_de_almeida.ticket_mania.catalog.controller;
 
-import com.github.rafael_souza_de_almeida.ticket_mania.dto.EventRequestDto;
-import com.github.rafael_souza_de_almeida.ticket_mania.dto.EventResponseDto;
-import com.github.rafael_souza_de_almeida.ticket_mania.service.EventService;
+import com.github.rafael_souza_de_almeida.ticket_mania.catalog.dto.EventRequestDto;
+import com.github.rafael_souza_de_almeida.ticket_mania.catalog.dto.EventResponseDto;
+import com.github.rafael_souza_de_almeida.ticket_mania.catalog.service.EventService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,9 +24,9 @@ public class EventController {
     }
 
     @PostMapping
-    public ResponseEntity<EventResponseDto> create(@RequestBody @Valid EventRequestDto requestDto) {
+    public ResponseEntity<com.github.rafael_souza_de_almeida.ticket_mania.catalog.dto.EventResponseDto> create(@RequestBody @Valid EventRequestDto requestDto) {
 
-        EventResponseDto response = eventService.create(requestDto);
+        com.github.rafael_souza_de_almeida.ticket_mania.catalog.dto.EventResponseDto response = eventService.create(requestDto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
 

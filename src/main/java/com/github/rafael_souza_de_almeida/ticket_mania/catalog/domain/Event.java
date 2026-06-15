@@ -1,4 +1,4 @@
-package com.github.rafael_souza_de_almeida.ticket_mania.domain;
+package com.github.rafael_souza_de_almeida.ticket_mania.catalog.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

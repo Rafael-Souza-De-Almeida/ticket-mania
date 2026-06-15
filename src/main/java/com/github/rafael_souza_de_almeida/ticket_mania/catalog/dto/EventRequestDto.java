@@ -1,6 +1,5 @@
-package com.github.rafael_souza_de_almeida.ticket_mania.dto;
+package com.github.rafael_souza_de_almeida.ticket_mania.catalog.dto;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

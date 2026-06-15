@@ -1,6 +1,6 @@
-package com.github.rafael_souza_de_almeida.ticket_mania.dto;
+package com.github.rafael_souza_de_almeida.ticket_mania.catalog.dto;
 
-import com.github.rafael_souza_de_almeida.ticket_mania.domain.Event;
+import com.github.rafael_souza_de_almeida.ticket_mania.catalog.domain.Event;
 import lombok.Getter;
 
 import java.math.BigInteger;

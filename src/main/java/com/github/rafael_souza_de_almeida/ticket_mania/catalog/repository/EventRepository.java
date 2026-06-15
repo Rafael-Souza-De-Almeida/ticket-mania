@@ -1,6 +1,6 @@
-package com.github.rafael_souza_de_almeida.ticket_mania.repository;
+package com.github.rafael_souza_de_almeida.ticket_mania.catalog.repository;
 
-import com.github.rafael_souza_de_almeida.ticket_mania.domain.Event;
+import com.github.rafael_souza_de_almeida.ticket_mania.catalog.domain.Event;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
