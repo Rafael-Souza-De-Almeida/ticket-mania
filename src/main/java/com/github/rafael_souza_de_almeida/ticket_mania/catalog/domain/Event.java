@@ -31,6 +31,6 @@ public class Event {
     private String place;
 
     @Column(nullable = false)
-    private BigInteger capacity;
+    private Integer capacity;
 
 }

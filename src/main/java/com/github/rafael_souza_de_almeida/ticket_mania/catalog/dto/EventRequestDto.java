@@ -24,5 +24,5 @@ public class EventRequestDto {
 
     @NotNull(message = "Event must have a capacity value.")
     @Positive(message = "The capacity must be greater than zero.")
-    private BigInteger capacity;
+    private Integer capacity;
 }

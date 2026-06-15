@@ -12,7 +12,7 @@ public class EventResponseDto {
     private String name;
     private LocalDateTime date;
     private String place;
-    private BigInteger capacity;
+    private Integer capacity;
 
     public EventResponseDto(Event event) {
         this.name = event.getName();
