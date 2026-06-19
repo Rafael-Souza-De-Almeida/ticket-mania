@@ -24,9 +24,9 @@ public class EventController {
     }
 
     @PostMapping
-    public ResponseEntity<com.github.rafael_souza_de_almeida.ticket_mania.catalog.dto.EventResponseDto> create(@RequestBody @Valid EventRequestDto requestDto) {
+    public ResponseEntity<EventResponseDto> create(@RequestBody @Valid EventRequestDto requestDto) {
 
-        com.github.rafael_souza_de_almeida.ticket_mania.catalog.dto.EventResponseDto response = eventService.create(requestDto);
+        EventResponseDto response = eventService.create(requestDto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
