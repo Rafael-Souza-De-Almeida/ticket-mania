@@ -1,10 +1,7 @@
 package com.github.rafael_souza_de_almeida.ticket_mania.catalog.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -13,7 +10,8 @@ import java.util.UUID;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 @Builder
 public class Event {
 
