@@ -1,8 +1,11 @@
 package com.github.rafael_souza_de_almeida.ticket_mania.catalog.controller;
 
 import com.github.rafael_souza_de_almeida.ticket_mania.catalog.domain.Event;
+import com.github.rafael_souza_de_almeida.ticket_mania.catalog.dto.EventRequestDto;
 import com.github.rafael_souza_de_almeida.ticket_mania.catalog.dto.EventResponseDto;
 import com.github.rafael_souza_de_almeida.ticket_mania.catalog.service.EventService;
+import com.github.rafael_souza_de_almeida.ticket_mania.order.service.TicketService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -28,73 +31,92 @@ class EventControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockitoBean
-    private EventService eventService;
-
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Test
-    @DisplayName("Should return 200 and an event list")
-    void shouldReturnAListWithAllEvents() throws Exception {
+    @MockitoBean
+    private EventService eventService;
 
-        LocalDateTime eventDate = LocalDateTime.of(
-                2026, 6, 24, 20, 0, 0);
+    @MockitoBean
+    private TicketService ticketService;
 
-        Event eventMock = new Event();
-        eventMock.setId(UUID.randomUUID());
-        eventMock.setName("Flamengo x São Paulo");
-        eventMock.setPlace("Maracanã");
-        eventMock.setCapacity(65000);
-        eventMock.setDate(eventDate);
+    private static final String EVENT_NAME = "Flamengo x São Paulo";
+    private static final String EVENT_PLACE = "Maracanã";
+    private static final int EVENT_CAPACITY = 65000;
+    private static final LocalDateTime EVENT_DATE = LocalDateTime.of(2027, 6, 24, 20, 0, 0);
+    private static final String API_URL = "/api/v1/event";
 
-        EventResponseDto eventDto = new EventResponseDto(eventMock);
+    private UUID eventId;
+    private EventResponseDto eventResponseDto;
 
-        Mockito.when(eventService.findAll()).thenReturn(List.of(eventDto));
-
-
-        mockMvc.perform(get("/api/v1/event")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Flamengo x São Paulo"))
-                .andExpect(jsonPath("$[0].date").value("2026-06-24T20:00:00"))
-                .andExpect(jsonPath("$[0].place").value("Maracanã"))
-                .andExpect(jsonPath("$[0].capacity").value(65000));
-
+    @BeforeEach
+    void setUp() {
+        eventId = UUID.randomUUID();
+        eventResponseDto = new EventResponseDto(buildEvent(eventId));
     }
 
-        @Test
-        @DisplayName("Should return 201 Created and the created event")
-        void shouldCreateAnEventAndReturn201() throws Exception {
+    @Test
+    @DisplayName("GET /api/v1/event - should return 200 and the event list")
+    void shouldReturnAListWithAllEvents() throws Exception {
+        Mockito.when(eventService.findAll()).thenReturn(List.of(eventResponseDto));
 
-            LocalDateTime eventDate = LocalDateTime.of(2026, 6, 24, 20, 0, 0);
-            UUID generatedId = UUID.randomUUID();
+        mockMvc.perform(get(API_URL)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(eventId.toString()))
+                .andExpect(jsonPath("$[0].name").value(EVENT_NAME))
+                .andExpect(jsonPath("$[0].date").value("2027-06-24T20:00:00"))
+                .andExpect(jsonPath("$[0].place").value(EVENT_PLACE))
+                .andExpect(jsonPath("$[0].capacity").value(EVENT_CAPACITY));
+    }
 
-            Event eventMock = new Event();
-            eventMock.setId(generatedId);
-            eventMock.setName("Flamengo x São Paulo");
-            eventMock.setPlace("Maracanã");
-            eventMock.setCapacity(65000);
-            eventMock.setDate(eventDate);
+    @Test
+    @DisplayName("POST /api/v1/event - should return 201 and event created")
+    void shouldCreateAnEventAndReturn201() throws Exception {
+        EventRequestDto requestPayload = buildEventRequest();
 
-            EventResponseDto responseDto = new EventResponseDto(eventMock);
+        Mockito.when(eventService.create(Mockito.any(EventRequestDto.class))).thenReturn(eventResponseDto);
 
-            Event requestPayload = new Event();
-            requestPayload.setName("Flamengo x São Paulo");
-            requestPayload.setPlace("Maracanã");
-            requestPayload.setCapacity(65000);
-            requestPayload.setDate(eventDate);
+        mockMvc.perform(post(API_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestPayload)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(eventId.toString()))
+                .andExpect(jsonPath("$.name").value(EVENT_NAME))
+                .andExpect(jsonPath("$.date").value("2027-06-24T20:00:00"))
+                .andExpect(jsonPath("$.place").value(EVENT_PLACE))
+                .andExpect(jsonPath("$.capacity").value(EVENT_CAPACITY));
+    }
 
+    @Test
+    @DisplayName("POST /api/v1/event - should return 400 when body is invalid")
+    void shouldReturn400WhenRequestIsInvalid() throws Exception {
+        mockMvc.perform(post(API_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isBadRequest());
+    }
 
-            Mockito.when(eventService.create(Mockito.any())).thenReturn(responseDto);
+    private Event buildEvent(UUID id) {
+        Event event = new Event();
+        event.setId(id);
+        event.setName(EVENT_NAME);
+        event.setPlace(EVENT_PLACE);
+        event.setCapacity(EVENT_CAPACITY);
+        event.setDate(EVENT_DATE);
+        return event;
+    }
 
-            mockMvc.perform(post("/api/v1/event")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(requestPayload)))
-                    .andExpect(status().isCreated())
-                    .andExpect(jsonPath("$.name").value("Flamengo x São Paulo"))
-                    .andExpect(jsonPath("$.date").value("2026-06-24T20:00:00"))
-                    .andExpect(jsonPath("$.place").value("Maracanã"))
-                    .andExpect(jsonPath("$.capacity").value(65000));
-        }
+    private EventRequestDto buildEventRequest() throws Exception {
+        String json = String.format("""
+                {
+                  "name": "%s",
+                  "place": "%s",
+                  "capacity": %d,
+                  "date": "%s"
+                }
+                """, EVENT_NAME, EVENT_PLACE, EVENT_CAPACITY, EVENT_DATE);
+
+        return objectMapper.readValue(json, EventRequestDto.class);
+    }
 }
