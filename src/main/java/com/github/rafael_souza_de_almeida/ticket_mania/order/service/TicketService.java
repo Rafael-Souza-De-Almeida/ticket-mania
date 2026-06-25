@@ -4,6 +4,7 @@ import com.github.rafael_souza_de_almeida.ticket_mania.catalog.domain.Event;
 import com.github.rafael_souza_de_almeida.ticket_mania.catalog.repository.EventRepository;
 import com.github.rafael_souza_de_almeida.ticket_mania.order.domain.Ticket;
 import com.github.rafael_souza_de_almeida.ticket_mania.order.domain.enums.TicketStatus;
+import com.github.rafael_souza_de_almeida.ticket_mania.order.domain.enums.TicketType;
 import com.github.rafael_souza_de_almeida.ticket_mania.order.dto.TicketBatchRequestDto;
 import com.github.rafael_souza_de_almeida.ticket_mania.order.exception.EventNotFoundException;
 import com.github.rafael_souza_de_almeida.ticket_mania.order.repository.TicketRepository;
@@ -37,6 +38,7 @@ public class TicketService {
                     .event(event)
                     .sectorCode(uniqueCode)
                     .price(dto.price())
+                    .type(dto.type())
                     .status(TicketStatus.AVAILABLE)
                     .build();
 
