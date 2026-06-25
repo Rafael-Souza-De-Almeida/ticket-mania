@@ -3,6 +3,8 @@ package com.github.rafael_souza_de_almeida.ticket_mania.catalog.controller;
 import com.github.rafael_souza_de_almeida.ticket_mania.catalog.dto.EventRequestDto;
 import com.github.rafael_souza_de_almeida.ticket_mania.catalog.dto.EventResponseDto;
 import com.github.rafael_souza_de_almeida.ticket_mania.catalog.service.EventService;
+import com.github.rafael_souza_de_almeida.ticket_mania.order.dto.TicketBatchRequestDto;
+import com.github.rafael_souza_de_almeida.ticket_mania.order.service.TicketService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -10,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/event")
@@ -17,6 +20,7 @@ import java.util.List;
 public class EventController {
 
     private final EventService eventService;
+    private final TicketService ticketService;
 
     @GetMapping
     public ResponseEntity<List<EventResponseDto>> findAll() {
@@ -29,6 +33,15 @@ public class EventController {
         EventResponseDto response = eventService.create(requestDto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+    }
+
+    @PostMapping("/{id}/tickets")
+    public ResponseEntity<Void> add_tickets(@PathVariable UUID id, @RequestBody TicketBatchRequestDto dto) {
+
+        ticketService.generateTicketsForEvent(id, dto);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
 
     }
 

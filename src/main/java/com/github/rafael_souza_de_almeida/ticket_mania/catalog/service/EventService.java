@@ -6,6 +6,7 @@ import com.github.rafael_souza_de_almeida.ticket_mania.catalog.dto.EventResponse
 import com.github.rafael_souza_de_almeida.ticket_mania.catalog.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class EventService{
 
     }
 
+    @Transactional
     public EventResponseDto create(EventRequestDto dto) {
 
         Event event = Event.builder()

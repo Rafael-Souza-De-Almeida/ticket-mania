@@ -28,6 +28,7 @@ public class Order {
     private Ticket ticket;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private OrderStatus status;
 
 }

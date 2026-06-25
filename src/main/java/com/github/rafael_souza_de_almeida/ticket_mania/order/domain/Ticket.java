@@ -26,11 +26,14 @@ public class Ticket {
     @JoinColumn(name = "event_id", nullable = false)
     private Event event;
 
-    private String code;
+    @Column(name = "sector_code", nullable = false)
+    private String sectorCode;
 
+    @Column(nullable = false)
     private BigDecimal price;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private TicketStatus status;
 
 }
