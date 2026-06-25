@@ -5,16 +5,19 @@ import lombok.Getter;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 public class EventResponseDto {
 
+    private UUID id;
     private String name;
     private LocalDateTime date;
     private String place;
     private Integer capacity;
 
     public EventResponseDto(Event event) {
+        this.id = event.getId();
         this.name = event.getName();
         this.date = event.getDate();
         this.place = event.getPlace();
