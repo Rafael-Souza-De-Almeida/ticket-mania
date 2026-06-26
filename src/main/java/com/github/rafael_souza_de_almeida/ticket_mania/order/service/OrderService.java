@@ -1,48 +1,47 @@
 package com.github.rafael_souza_de_almeida.ticket_mania.order.service;
 
-import com.github.rafael_souza_de_almeida.ticket_mania.order.domain.Order;
-import com.github.rafael_souza_de_almeida.ticket_mania.order.domain.Ticket;
-import com.github.rafael_souza_de_almeida.ticket_mania.order.domain.enums.OrderStatus;
-import com.github.rafael_souza_de_almeida.ticket_mania.order.domain.enums.TicketStatus;
+
 import com.github.rafael_souza_de_almeida.ticket_mania.order.dto.OrderRequestDto;
 import com.github.rafael_souza_de_almeida.ticket_mania.order.dto.OrderResponseDto;
 import com.github.rafael_souza_de_almeida.ticket_mania.order.exception.TicketUnavailableException;
-import com.github.rafael_souza_de_almeida.ticket_mania.order.repository.OrderRepository;
-import com.github.rafael_souza_de_almeida.ticket_mania.order.repository.TicketRepository;
+
 import lombok.RequiredArgsConstructor;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
 public class OrderService {
 
-    private final OrderRepository orderRepository;
-    private final TicketRepository ticketRepository;
+    private final RedissonClient redissonClient;
+    private final OrderTransactionalService orderTransactionalService;
 
-
-    @Transactional
     public OrderResponseDto create(OrderRequestDto dto) {
+        String lockKey = "lock:ticket:" + dto.ticketId();
+        RLock lock = redissonClient.getLock(lockKey);
 
-        // Implement User id verification
+        try {
+            boolean isLocked = lock.tryLock(1, 10, TimeUnit.SECONDS);
 
-        Ticket ticket = ticketRepository.findByIdAndStatus(dto.ticketId(), TicketStatus.AVAILABLE)
-                .orElseThrow(() -> new TicketUnavailableException("Unavailable ticket."));
+            if (!isLocked) {
+                throw new TicketUnavailableException("High traffic volume. This ticket is currently being processed by another user.");
+            }
 
-        ticket.setStatus(TicketStatus.RESERVED);
+            return orderTransactionalService.createWithTransaction(dto);
 
-        Order order = Order.builder()
-                .ticket(ticket)
-                .userId(dto.userId())
-                .status(OrderStatus.PENDING)
-                .build();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Thread interrupted while waiting for lock", e);
 
-        Order savedOrder = orderRepository.save(order);
-
-        return new OrderResponseDto(savedOrder.getId(), savedOrder.getTicket().getId(), savedOrder.getUserId());
-
-
-
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
     }
 
 
