@@ -3,6 +3,7 @@ package com.github.rafael_souza_de_almeida.ticket_mania.order.domain;
 
 import com.github.rafael_souza_de_almeida.ticket_mania.catalog.domain.Event;
 import com.github.rafael_souza_de_almeida.ticket_mania.order.domain.enums.TicketStatus;
+import com.github.rafael_souza_de_almeida.ticket_mania.order.domain.enums.TicketType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -31,6 +32,10 @@ public class Ticket {
 
     @Column(nullable = false)
     private BigDecimal price;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "ticket_type", nullable = false)
+    private TicketType type;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
