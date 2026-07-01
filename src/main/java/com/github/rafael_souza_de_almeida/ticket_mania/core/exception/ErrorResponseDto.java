@@ -1,4 +1,4 @@
-package com.github.rafael_souza_de_almeida.ticket_mania.order.dto;
+package com.github.rafael_souza_de_almeida.ticket_mania.core.exception;
 
 import java.time.LocalDateTime;
 
