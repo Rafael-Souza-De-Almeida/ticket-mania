@@ -8,10 +8,14 @@ import com.github.rafael_souza_de_almeida.ticket_mania.order.domain.enums.Ticket
 import com.github.rafael_souza_de_almeida.ticket_mania.order.dto.OrderRequestDto;
 import com.github.rafael_souza_de_almeida.ticket_mania.order.repository.OrderRepository;
 import com.github.rafael_souza_de_almeida.ticket_mania.order.repository.TicketRepository;
+import com.github.rafael_souza_de_almeida.ticket_mania.user.domain.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -79,17 +83,26 @@ public class OrderServiceConcurrencyTest {
 
 
         for (int i = 0; i < numOfThreads; i++) {
-            UUID randomUserId = UUID.randomUUID();
-            OrderRequestDto requestDto = new OrderRequestDto(ticket.getId(), randomUserId);
+            OrderRequestDto requestDto = new OrderRequestDto(ticket.getId());
+
+
+            User fakeUser = User.builder().id(UUID.randomUUID()).email("user" + i + "@test.com").build();
+
+            var authToken = new UsernamePasswordAuthenticationToken(fakeUser, null, fakeUser.getAuthorities());
 
             executorService.submit(() -> {
                 try {
+                    SecurityContext context = SecurityContextHolder.createEmptyContext();
+                    context.setAuthentication(authToken);
+                    SecurityContextHolder.setContext(context);
+
                     latch.await();
                     orderService.create(requestDto);
                     successCount.incrementAndGet();
                 } catch (Exception e) {
                     failureCount.incrementAndGet();
                 } finally {
+                    SecurityContextHolder.clearContext();
                     doneLatch.countDown();
                 }
             });

@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class OrderTransactionalService {
@@ -21,7 +23,7 @@ public class OrderTransactionalService {
     private final TicketRepository ticketRepository;
 
     @Transactional
-    public OrderResponseDto createWithTransaction(OrderRequestDto dto) {
+    public OrderResponseDto createWithTransaction(OrderRequestDto dto, UUID userId) {
 
         Ticket ticket = ticketRepository.findByIdAndStatus(dto.ticketId(), TicketStatus.AVAILABLE)
                 .orElseThrow(() -> new TicketUnavailableException("Unavailable ticket."));
@@ -33,7 +35,7 @@ public class OrderTransactionalService {
 
         Order order = Order.builder()
                 .ticket(ticket)
-                .userId(dto.userId())
+                .userId(userId)
                 .status(OrderStatus.PENDING)
                 .build();
 
