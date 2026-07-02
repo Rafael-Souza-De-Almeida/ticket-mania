@@ -5,11 +5,13 @@ import com.github.rafael_souza_de_almeida.ticket_mania.order.dto.OrderRequestDto
 import com.github.rafael_souza_de_almeida.ticket_mania.order.dto.OrderResponseDto;
 import com.github.rafael_souza_de_almeida.ticket_mania.order.exception.TicketUnavailableException;
 
+import com.github.rafael_souza_de_almeida.ticket_mania.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
 
 import java.util.concurrent.TimeUnit;
 
@@ -21,6 +23,13 @@ public class OrderService {
     private final OrderTransactionalService orderTransactionalService;
 
     public OrderResponseDto create(OrderRequestDto dto) {
+
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !(auth.getPrincipal() instanceof User loggedUser)) {
+            throw new InsufficientAuthenticationException("User is not authenticated or session is invalid.");
+        }
+
         String lockKey = "lock:ticket:" + dto.ticketId();
         RLock lock = redissonClient.getLock(lockKey);
 
@@ -31,7 +40,7 @@ public class OrderService {
                 throw new TicketUnavailableException("High traffic volume. This ticket is currently being processed by another user.");
             }
 
-            return orderTransactionalService.createWithTransaction(dto);
+            return orderTransactionalService.createWithTransaction(dto, loggedUser.getId());
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

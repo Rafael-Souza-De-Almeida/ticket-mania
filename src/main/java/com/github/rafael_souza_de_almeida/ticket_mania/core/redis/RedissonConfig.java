@@ -1,4 +1,4 @@
-package com.github.rafael_souza_de_almeida.ticket_mania.core;
+package com.github.rafael_souza_de_almeida.ticket_mania.core.redis;
 
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;

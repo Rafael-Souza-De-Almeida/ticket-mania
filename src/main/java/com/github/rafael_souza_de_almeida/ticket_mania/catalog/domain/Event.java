@@ -13,6 +13,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
+@Table(name = "tb_events")
 public class Event {
 
     @Id
