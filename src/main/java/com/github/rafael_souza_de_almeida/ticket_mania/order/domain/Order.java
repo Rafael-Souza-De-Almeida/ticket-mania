@@ -3,7 +3,9 @@ package com.github.rafael_souza_de_almeida.ticket_mania.order.domain;
 import com.github.rafael_souza_de_almeida.ticket_mania.order.domain.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -29,5 +31,11 @@ public class Order {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private OrderStatus status;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+
 
 }
