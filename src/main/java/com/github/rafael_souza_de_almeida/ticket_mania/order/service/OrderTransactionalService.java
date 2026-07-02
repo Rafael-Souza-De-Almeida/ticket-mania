@@ -9,6 +9,7 @@ import com.github.rafael_souza_de_almeida.ticket_mania.order.dto.OrderResponseDt
 import com.github.rafael_souza_de_almeida.ticket_mania.order.exception.TicketUnavailableException;
 import com.github.rafael_souza_de_almeida.ticket_mania.order.repository.OrderRepository;
 import com.github.rafael_souza_de_almeida.ticket_mania.order.repository.TicketRepository;
+import com.stripe.exception.StripeException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ public class OrderTransactionalService {
 
     private final OrderRepository orderRepository;
     private final TicketRepository ticketRepository;
+    private final PaymentService paymentService;
 
     @Transactional
     public OrderResponseDto createWithTransaction(OrderRequestDto dto, UUID userId) {
@@ -41,9 +43,17 @@ public class OrderTransactionalService {
 
         Order savedOrder = orderRepository.save(order);
 
-        return new OrderResponseDto(savedOrder.getId(),
-                savedOrder.getTicket().getId(),
-                savedOrder.getUserId());
+        try {
+            String clientSecret = paymentService.createPaymentIntent(savedOrder);
+
+            return new OrderResponseDto(savedOrder.getId(),
+                    savedOrder.getTicket().getId(),
+                    savedOrder.getUserId(),
+                    clientSecret);
+
+        } catch (StripeException e) {
+            throw new RuntimeException("Failed to initialize payment with Stripe", e);
+        }
 
     }
 }
