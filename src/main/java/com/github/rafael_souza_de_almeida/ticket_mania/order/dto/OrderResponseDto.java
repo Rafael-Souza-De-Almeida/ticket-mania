@@ -5,6 +5,7 @@ import java.util.UUID;
 public record OrderResponseDto(
         UUID orderId,
         UUID ticketId,
-        UUID userId
+        UUID userId,
+        String paymentClientSecret
 ) {
 }
