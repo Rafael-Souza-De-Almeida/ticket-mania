@@ -1,6 +1,7 @@
 package com.github.rafael_souza_de_almeida.ticket_mania.core.exception;
 
 import com.github.rafael_souza_de_almeida.ticket_mania.order.exception.EventNotFoundException;
+import com.github.rafael_souza_de_almeida.ticket_mania.order.exception.OrderNotFoundException;
 import com.github.rafael_souza_de_almeida.ticket_mania.order.exception.TicketUnavailableException;
 import com.github.rafael_souza_de_almeida.ticket_mania.user.exception.UserAlreadyRegistered;
 import com.github.rafael_souza_de_almeida.ticket_mania.user.exception.UserNotFoundException;
@@ -60,8 +61,22 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorResponseDto> usernNotFoundException(UserNotFoundException ex) {
+    public ResponseEntity<ErrorResponseDto> userNotFoundException(UserNotFoundException ex) {
 
+        HttpStatus status = HttpStatus.CONFLICT;
+
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
+                status.value(),
+                status.getReasonPhrase(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+
+        return ResponseEntity.status(status).body(errorResponse);
+    }
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> orderNotFoundException(OrderNotFoundException ex) {
         HttpStatus status = HttpStatus.CONFLICT;
 
         ErrorResponseDto errorResponse = new ErrorResponseDto(

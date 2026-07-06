@@ -2,14 +2,14 @@ package com.github.rafael_souza_de_almeida.ticket_mania.order.controller;
 
 import com.github.rafael_souza_de_almeida.ticket_mania.order.dto.OrderRequestDto;
 import com.github.rafael_souza_de_almeida.ticket_mania.order.dto.OrderResponseDto;
+import com.github.rafael_souza_de_almeida.ticket_mania.order.service.OrderPaymentService;
 import com.github.rafael_souza_de_almeida.ticket_mania.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/orders")
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderController {
 
     private final OrderService orderService;
+    private final OrderPaymentService orderPaymentService;
 
     @PostMapping
     public ResponseEntity<OrderResponseDto> create(@RequestBody OrderRequestDto requestDto) {
@@ -25,6 +26,12 @@ public class OrderController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
+    }
+
+    @PatchMapping("/mock-success/{orderId}")
+    public ResponseEntity<Void> simulateSuccessfulPayment(@PathVariable UUID orderId) {
+        orderPaymentService.fulfillOrder(orderId);
+        return ResponseEntity.ok().build();
     }
 
 }
