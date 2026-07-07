@@ -2,6 +2,7 @@ package com.github.rafael_souza_de_almeida.ticket_mania.order.service;
 
 import com.github.rafael_souza_de_almeida.ticket_mania.catalog.domain.Event;
 import com.github.rafael_souza_de_almeida.ticket_mania.catalog.repository.EventRepository;
+import com.github.rafael_souza_de_almeida.ticket_mania.order.domain.Order;
 import com.github.rafael_souza_de_almeida.ticket_mania.order.domain.Ticket;
 import com.github.rafael_souza_de_almeida.ticket_mania.order.domain.enums.TicketStatus;
 import com.github.rafael_souza_de_almeida.ticket_mania.order.domain.enums.TicketType;
@@ -9,6 +10,7 @@ import com.github.rafael_souza_de_almeida.ticket_mania.order.dto.OrderRequestDto
 import com.github.rafael_souza_de_almeida.ticket_mania.order.repository.OrderRepository;
 import com.github.rafael_souza_de_almeida.ticket_mania.order.repository.TicketRepository;
 import com.github.rafael_souza_de_almeida.ticket_mania.user.domain.User;
+import com.stripe.exception.StripeException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -23,11 +28,15 @@ import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
+@ActiveProfiles("test")
 public class OrderServiceConcurrencyTest {
 
     @Autowired
@@ -42,10 +51,13 @@ public class OrderServiceConcurrencyTest {
     @Autowired
     private OrderRepository orderRepository;
 
+    @MockitoBean
+    private PaymentService paymentService;
+
     private Ticket ticket;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws StripeException {
         orderRepository.deleteAll();
         ticketRepository.deleteAll();
         eventRepository.deleteAll();
@@ -66,6 +78,8 @@ public class OrderServiceConcurrencyTest {
                 .status(TicketStatus.AVAILABLE)
                 .build();
         ticketRepository.save(ticket);
+
+        when(paymentService.createPaymentIntent(any(Order.class))).thenReturn("fake_client_secret");
     }
 
     @Test
@@ -121,6 +135,9 @@ public class OrderServiceConcurrencyTest {
 
         Ticket updatedTicket = ticketRepository.findById(ticket.getId()).orElseThrow();
         assertEquals(TicketStatus.RESERVED, updatedTicket.getStatus());
+
+        executorService.shutdown();
+        executorService.awaitTermination(5, TimeUnit.SECONDS);
     }
 
 }
