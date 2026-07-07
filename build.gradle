@@ -36,6 +36,7 @@ dependencies {
 	implementation 'com.auth0:java-jwt:4.4.0'
 	implementation 'com.stripe:stripe-java:24.22.0'
 	implementation 'org.springframework.boot:spring-boot-starter-amqp'
+	testImplementation 'com.h2database:h2'
 }
 
 tasks.named('test') {
