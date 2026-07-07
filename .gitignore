@@ -8,7 +8,6 @@ build/
 # Security Keys
 src/main/resources/private_key.pem
 src/main/resources/public_key.pem
-*.pem
 
 ### STS ###
 .apt_generated
