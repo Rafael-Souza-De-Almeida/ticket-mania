@@ -1,12 +1,12 @@
 services:
   postgres:
-    image: 'postgres:latest'
+    image: "postgres:latest"
     environment:
-      - 'POSTGRES_DB=ticket-mania-db'
-      - 'POSTGRES_PASSWORD=password'
-      - 'POSTGRES_USER=admin'
+      - "POSTGRES_DB=ticket-mania-db"
+      - "POSTGRES_PASSWORD=password"
+      - "POSTGRES_USER=admin"
     ports:
-      - '5432:5432'
+      - "5432:5432"
 
   redis:
     image: redis:7.2-alpine
@@ -26,5 +26,26 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     restart: always
+
+  api:
+    image: ticket-mania-api:latest
+    container_name: ticket_mania_api
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=default
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/ticket-mania-db
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=password
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
+      - SPRING_RABBITMQ_HOST=rabbitmq
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+
 volumes:
   rabbitmq_data:
