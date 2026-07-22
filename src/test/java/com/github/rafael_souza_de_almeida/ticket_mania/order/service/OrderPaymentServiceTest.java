@@ -2,9 +2,12 @@ package com.github.rafael_souza_de_almeida.ticket_mania.order.service;
 
 import com.github.rafael_souza_de_almeida.ticket_mania.core.rabbitMq.RabbitMQConfig;
 import com.github.rafael_souza_de_almeida.ticket_mania.order.domain.Order;
+import com.github.rafael_souza_de_almeida.ticket_mania.order.domain.Ticket;
 import com.github.rafael_souza_de_almeida.ticket_mania.order.domain.enums.OrderStatus;
 import com.github.rafael_souza_de_almeida.ticket_mania.order.exception.OrderNotFoundException;
 import com.github.rafael_souza_de_almeida.ticket_mania.order.repository.OrderRepository;
+import com.github.rafael_souza_de_almeida.ticket_mania.order.repository.TicketRepository;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,19 +37,28 @@ class OrderPaymentServiceTest {
     @Mock
     private RabbitTemplate rabbitTemplate;
 
+    @Mock
+    private TicketRepository ticketRepository;
+
     @InjectMocks
     private OrderPaymentService orderPaymentService;
 
     private UUID orderId;
+    private UUID ticketId;
     private Order order;
+    private Ticket ticket;
 
     @BeforeEach
     void setUp() {
+        ticketId = UUID.randomUUID();
         orderId = UUID.randomUUID();
         order = Order.builder()
                 .id(orderId)
                 .userId(UUID.randomUUID())
                 .status(OrderStatus.PENDING)
+                .ticket(Ticket.builder()
+                        .id(ticketId)
+                        .build())
                 .build();
     }
 
@@ -54,6 +66,7 @@ class OrderPaymentServiceTest {
     @DisplayName("fulfillOrder - should mark the order as COMPLETED and publish the fulfillment event")
     void shouldFulfillPendingOrder() {
         when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+        when(ticketRepository.findById(ticketId)).thenReturn(Optional.of(order.getTicket()));
 
         orderPaymentService.fulfillOrder(orderId);
 
