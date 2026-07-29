@@ -36,6 +36,7 @@ dependencies {
 	implementation 'com.auth0:java-jwt:4.4.0'
 	implementation 'com.stripe:stripe-java:24.22.0'
 	implementation 'org.springframework.boot:spring-boot-starter-amqp'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.0'
 	testImplementation 'com.h2database:h2'
 }
 

@@ -36,6 +36,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/events/*/tickets").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/users/*/role").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/orders/mock-success/*").permitAll()
+                        .requestMatchers(
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/v3/api-docs",
+                        "/v3/api-docs/**",
+                        "/v3/api-docs.yaml"
+                ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
